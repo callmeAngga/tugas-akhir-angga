@@ -1,0 +1,1093 @@
+{% extends "base.html" %}
+{% block title %}TEA Rooftop PV — Analisis{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+<style>
+    /* ---- Peta ---- */
+    .map-wrap {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 200px);
+        min-height: 460px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        isolation: isolate;
+        z-index: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+        background: #0b0e14;
+    }
+
+    .map-search {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1200;
+        display: flex;
+        gap: 8px;
+        width: min(460px, calc(100% - 120px));
+        box-shadow: 0 6px 24px rgba(0, 0, 0, .45);
+        border-radius: 8px;
+    }
+
+    .map-search input {
+        flex: 1;
+        background: #161b22;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text);
+        padding: 11px 14px;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .map-search input:focus {
+        outline: none;
+        border-color: var(--accent);
+    }
+
+    .map-search button {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0 16px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .area-badge {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+        z-index: 800;
+        background: #161b22;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 14px 18px;
+        display: flex;
+        gap: 26px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, .35);
+    }
+
+    .area-badge .stat b {
+        display: block;
+        font-family: 'Sora', sans-serif;
+        font-size: 22px;
+        line-height: 1.1;
+        color: var(--accent-2);
+    }
+
+    .area-badge .stat span {
+        font-size: 11px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    /* ---- Label seksi ---- */
+    .section-label {
+        font-family: 'Sora', sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: var(--text-dim);
+        margin: 34px 0 14px;
+    }
+
+    /* ---- Panel konfigurasi ---- */
+    .config {
+        margin-top: 20px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px 28px;
+    }
+
+    .config h2 {
+        font-size: 17px;
+        margin-bottom: 4px;
+    }
+
+    .config .sub {
+        color: var(--text-dim);
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px 22px;
+    }
+
+    /* ---- Tooltip/penjelasan field ---- */
+    .field-info {
+        font-size: 11px;
+        color: var(--text-dim);
+        line-height: 1.5;
+        margin-top: 4px;
+        padding: 6px 10px;
+        background: rgba(47, 129, 247, .06);
+        border-left: 2px solid rgba(47, 129, 247, .3);
+        border-radius: 0 4px 4px 0;
+    }
+
+    /* ---- Custom module panel ---- */
+    .custom-module-box {
+        display: none;
+        margin-top: 16px;
+        background: rgba(47, 129, 247, .05);
+        border: 1px solid rgba(47, 129, 247, .25);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+    }
+
+    .custom-module-box.visible {
+        display: block;
+    }
+
+    .custom-module-box .box-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        margin-bottom: 14px;
+    }
+
+    /* ---- Rekomendasi orientasi ---- */
+    .reco {
+        margin-top: 22px;
+        border: 1px solid rgba(47, 129, 247, .4);
+        background: linear-gradient(160deg, var(--surface-2), rgba(47, 129, 247, .06));
+        border-radius: var(--radius);
+        padding: 18px 22px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+    .reco .r b {
+        display: block;
+        font-family: 'Sora', sans-serif;
+        font-size: 20px;
+        color: var(--accent-2);
+    }
+
+    .reco .r span {
+        font-size: 11px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .reco .reco-method {
+        flex: 1;
+        min-width: 180px;
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+
+    .reco label.toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .reco.pending {
+        opacity: .5;
+    }
+
+    /* ---- Footer konfigurasi ---- */
+    .config-footer {
+        margin-top: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        border-top: 1px solid var(--border);
+        padding-top: 20px;
+    }
+
+    .config-footer .summary {
+        display: flex;
+        gap: 30px;
+    }
+
+    .config-footer .summary .s b {
+        display: block;
+        font-family: 'Sora', sans-serif;
+        font-size: 18px;
+        color: var(--text);
+    }
+
+    .config-footer .summary .s span {
+        font-size: 11px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .config-footer .btn-primary {
+        min-width: 240px;
+    }
+
+    /* ---- Seksi hasil ---- */
+    #resultSection {
+        display: none;
+        margin-top: 10px;
+    }
+
+    .result-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .result-head h2 {
+        font-size: 22px;
+    }
+
+    .result-head p {
+        color: var(--text-dim);
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    .verdict {
+        font-family: 'Sora', sans-serif;
+        font-weight: 700;
+        font-size: 13px;
+        padding: 7px 15px;
+        border-radius: 999px;
+    }
+
+    .verdict.good {
+        background: rgba(63, 185, 80, .14);
+        color: var(--good);
+        border: 1px solid rgba(63, 185, 80, .4);
+    }
+
+    .verdict.bad {
+        background: rgba(240, 136, 62, .14);
+        color: var(--warn);
+        border: 1px solid rgba(240, 136, 62, .4);
+    }
+
+    .metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 16px;
+    }
+
+    .metric {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px 24px;
+    }
+
+    .metric .label {
+        font-size: 12px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-weight: 600;
+    }
+
+    .metric .value {
+        font-family: 'Sora', sans-serif;
+        font-weight: 700;
+        font-size: 30px;
+        line-height: 1.15;
+        margin-top: 10px;
+    }
+
+    .metric .unit {
+        font-size: 15px;
+        color: var(--text-dim);
+        font-weight: 500;
+    }
+
+    .metric.npv {
+        border-color: rgba(47, 129, 247, .5);
+        background: linear-gradient(160deg, var(--surface), rgba(47, 129, 247, .06));
+    }
+
+    .metric.npv .value {
+        color: var(--accent-2);
+    }
+
+    .metric.wide {
+        grid-column: span 2;
+    }
+
+    /* ---- Kartu grafik GHI ---- */
+    .chart-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px 24px 18px;
+        margin-top: 4px;
+    }
+
+    .chart-card .chart-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+    .chart-card .chart-head h3 {
+        font-size: 16px;
+    }
+
+    .chart-card .chart-head .chart-sub {
+        font-size: 12px;
+        color: var(--text-dim);
+    }
+
+    .chart-canvas-wrap {
+        position: relative;
+        width: 100%;
+        height: 320px;
+    }
+
+    .err-box {
+        margin-top: 16px;
+        background: rgba(240, 136, 62, .12);
+        border: 1px solid rgba(240, 136, 62, .4);
+        color: var(--warn);
+        padding: 12px 18px;
+        border-radius: var(--radius);
+        font-size: 14px;
+        display: none;
+    }
+
+    @media (max-width: 480px) {
+        .metric.wide {
+            grid-column: span 1;
+        }
+    }
+
+    /* ---- Tombol kembali ke landing ---- */
+    .back-bar {
+        margin-bottom: 16px;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-dim);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 8px 16px;
+        transition: color .15s, border-color .15s;
+    }
+
+    .back-link:hover {
+        color: var(--text);
+        border-color: var(--accent);
+    }
+
+    /* ---- Overlay loading saat analisis ---- */
+    .loading-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 18px;
+        background: rgba(13, 17, 23, .78);
+        backdrop-filter: blur(2px);
+    }
+
+    .loading-overlay.visible {
+        display: flex;
+    }
+
+    .loading-overlay .spinner {
+        width: 54px;
+        height: 54px;
+        border: 4px solid rgba(47, 129, 247, .2);
+        border-top-color: var(--accent-2);
+        border-radius: 50%;
+        animation: spin .8s linear infinite;
+    }
+
+    .loading-overlay .loading-text {
+        font-family: 'Sora', sans-serif;
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text);
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="back-bar">
+    <a href="{{ url_for('landing') }}" class="back-link">← Kembali ke Beranda</a>
+</div>
+
+<div class="map-wrap">
+    <div id="map"></div>
+
+    <div class="map-search">
+        <input id="searchInput" type="text" placeholder="Cari lokasi, alamat, atau kota…">
+        <button id="searchBtn">Cari</button>
+    </div>
+
+    <div class="area-badge">
+        <div class="stat"><b id="roofArea">0 m²</b><span>Luas Atap</span></div>
+        <div class="stat"><b id="usableArea">0 m²</b><span>Area Efektif</span></div>
+    </div>
+</div>
+
+<div class="config">
+    <h2>Konfigurasi Sistem</h2>
+    <div class="sub">Atur asumsi sistem PV dan parameter ekonomi, lalu jalankan analisis.</div>
+
+    <div class="config-grid">
+
+        <!-- Modul PV -->
+        <div class="field">
+            <label>Modul PV</label>
+            <select id="pvModule">
+                {% for key, m in modules.items() %}
+                <option value="{{ key }}" data-watt="{{ m.watt }}" data-area="{{ m.area_m2 }}">{{ m.name }}</option>
+                {% endfor %}
+                <option value="custom" data-watt="0" data-area="0">⚙️ Modul Kustom…</option>
+            </select>
+            <div class="field-info">
+                Jenis panel surya yang akan dipasang. Menentukan daya per panel (Wp)
+                dan luas fisik per panel, yang digunakan untuk menghitung jumlah panel
+                dan total kapasitas sistem (kWp).
+            </div>
+        </div>
+
+        <!-- Spesifikasi Modul -->
+        <div class="field">
+            <label>Spesifikasi Modul</label>
+            <input type="text" id="moduleSpec" value="" readonly>
+            <div class="field-info">
+                Daya terukur (Watt-peak) dan luas fisik per panel. Nilai ini
+                dihitung otomatis dari pilihan modul di atas, atau diisi manual
+                jika memilih modul kustom.
+            </div>
+        </div>
+
+        <!-- Performance Ratio -->
+        <div class="field">
+            <label>Performance Ratio (PR)</label>
+            <input type="number" step="0.01" min="0.5" max="1" id="performance_ratio"
+                value="{{ defaults.performance_ratio }}">
+            <div class="field-info">
+                Efisiensi sistem secara keseluruhan (0–1), memperhitungkan rugi-rugi
+                kabel, inverter, suhu, dan kotoran panel. Nilai umum: 0,75–0,85.
+                Gunakan 0,70 jika terdapat bayangan signifikan.
+            </div>
+        </div>
+
+        <!-- Tarif Listrik -->
+        <div class="field">
+            <label>Tarif Listrik (Rp/kWh)</label>
+            <input type="number" step="0.01" min="0" id="tarif_rp_kwh" value="{{ defaults.tarif_rp_kwh }}">
+            <div class="field-info">
+                Harga listrik PLN yang berlaku (Rp per kWh). Digunakan untuk
+                menghitung penghematan tagihan listrik tahunan dari energi yang
+                dihasilkan sistem PV. Sesuaikan dengan golongan tarif Anda.
+            </div>
+        </div>
+
+        <!-- CAPEX -->
+        <div class="field">
+            <label>CAPEX (Rp/kWp)</label>
+            <input type="number" step="100000" min="0" id="capex_per_kwp" value="{{ defaults.capex_per_kwp }}">
+            <div class="field-info">
+                Biaya investasi awal per kilowatt-peak kapasitas terpasang, mencakup
+                panel, inverter, struktur, kabel, dan instalasi. Kisaran umum di
+                Indonesia: Rp 10–20 juta/kWp. Minta penawaran dari installer lokal.
+            </div>
+        </div>
+
+        <!-- Discount Rate -->
+        <div class="field">
+            <label>Tingkat Diskonto</label>
+            <input type="number" step="0.01" min="0" max="1" id="discount_rate" value="{{ defaults.discount_rate }}">
+            <div class="field-info">
+                Tingkat bunga yang digunakan untuk mendiskonto arus kas masa depan
+                ke nilai saat ini (0–1). Mencerminkan biaya modal atau tingkat
+                pengembalian minimum yang diharapkan. Contoh: 0,06 = 6% per tahun.
+            </div>
+        </div>
+
+        <!-- Umur Proyek -->
+        <div class="field">
+            <label>Umur Proyek (tahun)</label>
+            <input type="number" step="1" min="1" max="40" id="lifetime_thn" value="{{ defaults.lifetime_thn }}">
+            <div class="field-info">
+                Periode analisis ekonomi dalam tahun. Umumnya mengikuti garansi
+                performa panel (25 tahun). Semakin panjang umur proyek, semakin
+                besar akumulasi penghematan yang diperhitungkan dalam NPV.
+            </div>
+        </div>
+
+        <!-- Degradasi Tahunan -->
+        <div class="field">
+            <label>Degradasi Tahunan</label>
+            <input type="number" step="0.001" min="0" max="0.05" id="degradasi" value="{{ defaults.degradasi }}">
+            <div class="field-info">
+                Penurunan produksi energi panel per tahun akibat penuaan (0–0,05).
+                Panel monokristalin modern umumnya terdegradasi 0,5%/tahun (0,005).
+                Nilai ini mengurangi energi yang dihasilkan setiap tahunnya.
+            </div>
+        </div>
+
+        <!-- Self-Consumption -->
+        <div class="field">
+            <label>Self-Consumption</label>
+            <input type="number" step="0.01" min="0" max="1" id="self_consumption"
+                value="{{ defaults.self_consumption }}">
+            <div class="field-info">
+                Fraksi energi PV yang langsung dipakai sendiri (0–1), bukan diekspor.
+                Hanya energi yang dikonsumsi sendiri yang menggantikan tarif PLN dalam
+                perhitungan penghematan. Nilai skripsi: 0,65.
+            </div>
+        </div>
+
+        <!-- OPEX Rate -->
+        <div class="field">
+            <label>OPEX (fraksi CAPEX/tahun)</label>
+            <input type="number" step="0.001" min="0" max="0.1" id="opex_rate"
+                value="{{ defaults.opex_rate }}">
+            <div class="field-info">
+                Biaya operasional & pemeliharaan tahunan sebagai fraksi dari CAPEX
+                (0–0,1). Mencakup pembersihan, inspeksi, dan penggantian komponen.
+                Nilai skripsi: 0,01 (1% CAPEX/tahun).
+            </div>
+        </div>
+
+        <!-- Eskalasi Tarif -->
+        <div class="field">
+            <label>Eskalasi Tarif Listrik</label>
+            <input type="number" step="0.001" min="0" max="0.2" id="eskalasi_tarif"
+                value="{{ defaults.eskalasi_tarif }}">
+            <div class="field-info">
+                Kenaikan tarif listrik PLN per tahun (0–0,2). Semakin tinggi eskalasi,
+                semakin besar nilai penghematan di masa depan. Nilai skripsi: 0,03
+                (3%/tahun).
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ---- Panel Modul Kustom ---- -->
+    <div class="custom-module-box" id="customModuleBox">
+        <div class="box-title">⚙️ Spesifikasi Modul Kustom</div>
+        <div class="config-grid">
+            <div class="field">
+                <label>Daya Panel (Wp)</label>
+                <input type="number" step="1" min="50" max="1000" id="customWatt" value="400" placeholder="cth: 450">
+                <div class="field-info">
+                    Daya terukur satu panel dalam kondisi standar (STC).
+                    Tertera pada label belakang panel atau datasheet.
+                </div>
+            </div>
+            <div class="field">
+                <label>Luas Panel (m²/panel)</label>
+                <input type="number" step="0.01" min="0.5" max="5" id="customArea" value="2.0" placeholder="cth: 2.1">
+                <div class="field-info">
+                    Dimensi fisik satu panel (panjang × lebar). Digunakan untuk
+                    menghitung berapa panel yang muat di area atap yang tersedia.
+                </div>
+            </div>
+            <div class="field">
+                <label>Nama Modul (opsional)</label>
+                <input type="text" id="customName" value="" placeholder="cth: Jinko 450W Bifacial">
+                <div class="field-info">
+                    Nama atau kode produk modul untuk keperluan identifikasi
+                    pada laporan hasil analisis.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ---- Rekomendasi Orientasi Otomatis ---- -->
+    <div class="reco pending" id="recoBox">
+        <div class="r"><b id="recoTilt">—</b><span>Tilt Rekomendasi</span></div>
+        <div class="r"><b id="recoAzimuth">—</b><span>Azimuth Rekomendasi</span></div>
+        <div class="reco-method" id="recoMethod">
+            Gambar atap pada peta untuk menghitung orientasi panel optimal secara otomatis.
+        </div>
+        <label class="toggle">
+            <input type="checkbox" id="useReco" checked>
+            <span>✓ Gunakan pengaturan rekomendasi</span>
+        </label>
+    </div>
+    <!-- ---- Override Manual (advanced) ---- -->
+    <div class="config-grid" id="manualOrientation" style="margin-top:18px; display:none;">
+        <div class="field">
+            <label>Tilt (°) — manual</label>
+            <input type="number" step="1" min="0" max="90" id="tilt" value="{{ defaults.tilt }}">
+            <div class="field-info">
+                Sudut kemiringan panel terhadap bidang horizontal (0° = datar,
+                90° = tegak). Nilai optimal di Indonesia umumnya 5–15°.
+            </div>
+        </div>
+        <div class="field">
+            <label>Azimuth (°) — manual</label>
+            <input type="number" step="1" min="0" max="359" id="azimuth" value="{{ defaults.azimuth }}">
+            <div class="field-info">
+                Arah hadap panel diukur dari Utara searah jarum jam.
+                0° = Utara, 90° = Timur, 180° = Selatan, 270° = Barat.
+                Panel idealnya menghadap ekuator (Utara untuk lintang selatan).
+            </div>
+        </div>
+    </div>
+
+    <div class="config-footer">
+        <div class="summary">
+            <div class="s"><b id="sumPanels">0</b><span>Maks. Panel</span></div>
+            <div class="s"><b id="sumCapacity">0,00 kWp</b><span>Kapasitas Terpasang</span></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="runBtn">Jalankan Analisis →</button>
+    </div>
+
+    <div class="err-box" id="errBox"></div>
+</div>
+
+<div id="resultSection">
+    <div class="section-label">Hasil Analisis</div>
+    <div class="result-head">
+        <div>
+            <h2>Analisis Kelayakan</h2>
+            <p id="resultMeta"></p>
+        </div>
+        <span class="verdict" id="verdict"></span>
+    </div>
+
+    <div class="section-label">Sistem &amp; Lokasi</div>
+    <div class="metrics">
+        <div class="metric">
+            <div class="label">Luas Atap</div>
+            <div class="value" id="mArea"></div>
+        </div>
+        <div class="metric">
+            <div class="label">Jumlah Panel Maksimum</div>
+            <div class="value" id="mPanels"></div>
+        </div>
+        <div class="metric">
+            <div class="label">Kapasitas Terpasang</div>
+            <div class="value" id="mCap"></div>
+        </div>
+    </div>
+
+    <div class="section-label">Sumber Daya Surya &amp; Energi</div>
+    <div class="metrics">
+        <div class="metric">
+            <div class="label">Estimasi GHI Tahunan</div>
+            <div class="value" id="mGhi"></div>
+        </div>
+        <div class="metric">
+            <div class="label">Produksi Energi Tahunan</div>
+            <div class="value" id="mAep"></div>
+        </div>
+        <div class="metric">
+            <div class="label">Specific Yield</div>
+            <div class="value" id="mYield"></div>
+        </div>
+    </div>
+
+    <div class="section-label">Profil GHI Prediksi (1 Tahun)</div>
+    <div class="chart-card">
+        <div class="chart-head">
+            <h3>Prediksi GHI Harian</h3>
+            <div class="chart-sub" id="chartSub">Forecast harian 2026</div>
+        </div>
+        <div class="chart-canvas-wrap">
+            <canvas id="ghiChart"></canvas>
+        </div>
+    </div>
+
+    <div class="section-label">Hasil Tekno-Ekonomi</div>
+    <div class="metrics">
+        <div class="metric npv wide">
+            <div class="label">Net Present Value (NPV)</div>
+            <div class="value" id="mNpv"></div>
+        </div>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Menjalankan analisis…</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const USABLE_FRACTION = 0.70;
+
+    // ---- Inisialisasi Peta ----
+    const map = L.map('map', { zoomControl: true, preferCanvas: false })
+        .setView([-6.2, 106.816], 12);
+
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 20, attribution: '© OpenStreetMap'
+    }).addTo(map);
+    const sat = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 20, attribution: '© Esri' }
+    );
+    L.control.layers({ 'Peta Jalan': osm, 'Satelit': sat }, null, { position: 'topright' }).addTo(map);
+
+    // ---- Perbaikan tile blank/hitam: paksa recalculed ukuran kontainer ----
+    function refreshMap() {
+        map.invalidateSize({ animate: false });
+    }
+    // Panggil setelah layout & font stabil, dan tiap kali kontainer berubah ukuran.
+    window.addEventListener('load', () => { refreshMap(); setTimeout(refreshMap, 250); });
+    window.addEventListener('resize', refreshMap);
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(refreshMap);
+    }
+    if (window.ResizeObserver) {
+        new ResizeObserver(refreshMap).observe(document.getElementById('map'));
+    }
+    map.whenReady(() => setTimeout(refreshMap, 100));
+
+    // ---- Alat Gambar ----
+    const drawn = new L.FeatureGroup();
+    map.addLayer(drawn);
+    const drawControl = new L.Control.Draw({
+        position: 'topleft',
+        edit: { featureGroup: drawn },
+        draw: {
+            rectangle: { shapeOptions: { color: '#2f81f7' } },
+            polygon: { shapeOptions: { color: '#2f81f7' } },
+            polyline: false, circle: false, marker: false, circlemarker: false
+        }
+    });
+    map.addControl(drawControl);
+
+    // State lokasi & area
+    let currentLat = null, currentLon = null, currentArea = 0;
+
+    function updateArea(layer) {
+        const latlngs = layer.getLatLngs()[0];
+        const area = L.GeometryUtil.geodesicArea(latlngs);
+        const usable = area * USABLE_FRACTION;
+        const c = layer.getBounds().getCenter();
+
+        currentArea = area;
+        currentLat = c.lat;
+        currentLon = c.lng;
+
+        document.getElementById('roofArea').textContent = Math.round(area).toLocaleString('id-ID') + ' m²';
+        document.getElementById('usableArea').textContent = Math.round(usable).toLocaleString('id-ID') + ' m²';
+        updateSystem(area);
+        fetchRecommendation(c.lat, c.lng);
+    }
+
+    map.on(L.Draw.Event.CREATED, e => { drawn.clearLayers(); drawn.addLayer(e.layer); updateArea(e.layer); });
+    map.on(L.Draw.Event.EDITED, e => e.layers.eachLayer(l => updateArea(l)));
+
+    // ---- Logika Modul PV (termasuk kustom) ----
+    function getModuleParams() {
+        const sel = document.getElementById('pvModule');
+        if (sel.value === 'custom') {
+            return {
+                watt: parseFloat(document.getElementById('customWatt').value) || 0,
+                area: parseFloat(document.getElementById('customArea').value) || 0,
+                name: document.getElementById('customName').value.trim() || 'Modul Kustom',
+            };
+        }
+        const opt = sel.selectedOptions[0];
+        return {
+            watt: parseFloat(opt.dataset.watt),
+            area: parseFloat(opt.dataset.area),
+            name: opt.textContent.trim(),
+        };
+    }
+
+    function updateSystem(area) {
+        const m = getModuleParams();
+        const usable = area * USABLE_FRACTION;
+        const n = m.area > 0 ? Math.floor(usable / m.area) : 0;
+        const cap = n * m.watt / 1000;
+
+        document.getElementById('sumPanels').textContent = n.toLocaleString('id-ID');
+        document.getElementById('sumCapacity').textContent = cap.toFixed(2) + ' kWp';
+        document.getElementById('moduleSpec').value =
+            m.watt > 0 ? m.watt + ' Wp · ' + m.area + ' m²/panel' : '—';
+    }
+
+    // Tampilkan/sembunyikan form kustom
+    document.getElementById('pvModule').addEventListener('change', function () {
+        const box = document.getElementById('customModuleBox');
+        if (this.value === 'custom') {
+            box.classList.add('visible');
+        } else {
+            box.classList.remove('visible');
+        }
+        updateSystem(currentArea);
+    });
+
+    // Update preview saat input kustom berubah
+    ['customWatt', 'customArea', 'customName'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => updateSystem(currentArea));
+    });
+
+    updateSystem(0);
+
+    // ---- Rekomendasi Orientasi Otomatis ----
+    async function fetchRecommendation(lat, lon) {
+        document.getElementById('runBtn').disabled = true;
+        const box = document.getElementById('recoBox');
+        box.classList.add('pending');
+        document.getElementById('recoMethod').textContent = 'Menghitung orientasi optimal…';
+        try {
+            const res = await fetch('/api/recommend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lat, lon })
+            });
+            const d = await res.json();
+            if (d.error) throw new Error(d.error);
+
+            document.getElementById('recoTilt').textContent = d.tilt + '°';
+            document.getElementById('recoAzimuth').textContent = d.azimuth + '° · ' + d.azimuth_label;
+            document.getElementById('recoMethod').textContent =
+                'Orientasi optimal berbasis fisika (transposisi Perez), konsisten dengan metodologi skripsi.';
+            box.classList.remove('pending');
+
+            if (document.getElementById('useReco').checked) {
+                document.getElementById('tilt').value = d.tilt;
+                document.getElementById('azimuth').value = d.azimuth;
+            }
+            box.dataset.tilt = d.tilt;
+            box.dataset.azimuth = d.azimuth;
+        } catch (err) {
+            document.getElementById('recoMethod').textContent = 'Rekomendasi gagal: ' + err.message;
+        } finally {
+            document.getElementById('runBtn').disabled = false;
+        }
+    }
+
+    // Toggle manual override
+    document.getElementById('useReco').addEventListener('change', e => {
+        const manual = document.getElementById('manualOrientation');
+        manual.style.display = e.target.checked ? 'none' : 'grid';
+        if (e.target.checked && document.getElementById('recoBox').dataset.tilt) {
+            document.getElementById('tilt').value = document.getElementById('recoBox').dataset.tilt;
+            document.getElementById('azimuth').value = document.getElementById('recoBox').dataset.azimuth;
+        }
+    });
+
+    // ---- Pencarian Lokasi ----
+    async function doSearch() {
+        const q = document.getElementById('searchInput').value.trim();
+        if (!q) return;
+        const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+        try {
+            const res = await fetch(url, { headers: { 'Accept-Language': 'id' } });
+            const data = await res.json();
+            if (data.length) {
+                map.setView([parseFloat(data[0].lat), parseFloat(data[0].lon)], 18);
+                setTimeout(refreshMap, 300);
+            } else {
+                alert('Lokasi tidak ditemukan.');
+            }
+        } catch { alert('Pencarian gagal. Coba lagi.'); }
+    }
+    document.getElementById('searchBtn').addEventListener('click', doSearch);
+    document.getElementById('searchInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
+    });
+
+    const fmt = n => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 0 });
+
+    document.getElementById('runBtn').addEventListener('click', async () => {
+        const errBox = document.getElementById('errBox');
+        errBox.style.display = 'none';
+
+        if (!currentArea || currentArea <= 0) {
+            errBox.textContent = 'Silakan gambar area atap pada peta terlebih dahulu.';
+            errBox.style.display = 'block';
+            return;
+        }
+
+        const btn = document.getElementById('runBtn');
+        btn.textContent = 'Menjalankan analisis…';
+        btn.disabled = true;
+        document.getElementById('loadingOverlay').classList.add('visible');
+
+        const m = getModuleParams();
+
+        const payload = {
+            lat: currentLat, lon: currentLon, area_m2: currentArea,
+            pv_module: document.getElementById('pvModule').value,
+            custom_watt: m.watt,
+            custom_area: m.area,
+            custom_name: m.name,
+            performance_ratio: document.getElementById('performance_ratio').value,
+            tarif_rp_kwh: document.getElementById('tarif_rp_kwh').value,
+            capex_per_kwp: document.getElementById('capex_per_kwp').value,
+            discount_rate: document.getElementById('discount_rate').value,
+            lifetime_thn: document.getElementById('lifetime_thn').value,
+            degradasi: document.getElementById('degradasi').value,
+            self_consumption: document.getElementById('self_consumption').value,
+            opex_rate: document.getElementById('opex_rate').value,
+            eskalasi_tarif: document.getElementById('eskalasi_tarif').value,
+            tilt: document.getElementById('tilt').value,
+            azimuth: document.getElementById('azimuth').value,
+        };
+
+        try {
+            const res = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const r = await res.json();
+            if (!res.ok || r.error) throw new Error(r.error || 'Analisis gagal.');
+            renderResult(r);
+        } catch (err) {
+            errBox.textContent = err.message;
+            errBox.style.display = 'block';
+        } finally {
+            btn.textContent = 'Jalankan Analisis →';
+            btn.disabled = false;
+            document.getElementById('loadingOverlay').classList.remove('visible');
+        }
+    });
+
+    function renderResult(r) {
+        document.getElementById('resultMeta').textContent =
+            'Lokasi ' + r.lokasi.lat.toFixed(5) + ', ' + r.lokasi.lon.toFixed(5) +
+            ' · ' + r.pv_module +
+            ' · tilt ' + r.orientasi.tilt + '° / azimuth ' + r.orientasi.azimuth +
+            '° · baseline forecast 2026';
+
+        const v = document.getElementById('verdict');
+        v.textContent = r.layak ? 'Layak Secara Finansial' : 'Tidak Layak pada Asumsi Ini';
+        v.className = 'verdict ' + (r.layak ? 'good' : 'bad');
+
+        document.getElementById('mArea').innerHTML = fmt(r.lokasi.area_m2) + ' <span class="unit">m²</span>';
+        document.getElementById('mPanels').textContent = fmt(r.n_panels);
+        document.getElementById('mCap').innerHTML = r.capacity_kwp.toFixed(2) + ' <span class="unit">kWp</span>';
+        document.getElementById('mGhi').innerHTML = fmt(r.energi.ghi_annual_kwh_m2) + ' <span class="unit">kWh/m²</span>';
+        document.getElementById('mAep').innerHTML = fmt(r.energi.aep_kwh) + ' <span class="unit">kWh/thn</span>';
+        document.getElementById('mYield').innerHTML = fmt(r.energi.specific_yield_kwh_kwp) + ' <span class="unit">kWh/kWp</span>';
+        document.getElementById('mNpv').textContent = 'Rp ' + fmt(r.npv);
+
+        renderGhiChart(r.ghi_profile);
+
+        const sec = document.getElementById('resultSection');
+        sec.style.display = 'block';
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ---- Grafik GHI Prediksi (Chart.js) ----
+    let ghiChart = null;
+    function renderGhiChart(profile) {
+        if (!profile || !profile.values) return;
+        const ctx = document.getElementById('ghiChart').getContext('2d');
+
+        // Label sumbu-x hanya di awal tiap bulan agar tidak padat.
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+            'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        const labels = profile.labels.map(d => {
+            const dt = new Date(d);
+            return dt.getDate() === 1 ? monthNames[dt.getMonth()] : '';
+        });
+
+        const grad = ctx.createLinearGradient(0, 0, 0, 320);
+        grad.addColorStop(0, 'rgba(0,212,255,.35)');
+        grad.addColorStop(1, 'rgba(0,212,255,0)');
+
+        if (ghiChart) ghiChart.destroy();
+        ghiChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'GHI (kWh/m²/hari)',
+                    data: profile.values,
+                    borderColor: '#00d4ff',
+                    backgroundColor: grad,
+                    borderWidth: 1.6,
+                    pointRadius: 0,
+                    pointHoverRadius: 4,
+                    tension: 0.3,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: items => 'Hari ke-' + (items[0].dataIndex + 1),
+                            label: item => item.parsed.y.toFixed(2) + ' kWh/m²/hari',
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,.05)' },
+                        ticks: { color: '#8b98a9', autoSkip: false, maxRotation: 0 },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,.06)' },
+                        ticks: { color: '#8b98a9' },
+                        title: { display: true, text: 'GHI (kWh/m²/hari)', color: '#8b98a9' },
+                    }
+                }
+            }
+        });
+
+        document.getElementById('chartSub').textContent =
+            'Forecast harian 2026 · total ' +
+            fmt(profile.annual_kwh_m2) + ' kWh/m²/thn';
+    }
+</script>
+{% endblock %}

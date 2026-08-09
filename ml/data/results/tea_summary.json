@@ -1,0 +1,85 @@
+{
+  "metodologi": {
+    "baseline": "forecast 2026 (climatology-based future covariates)",
+    "future_covariates": "climatology day-of-year (2021-2025)",
+    "uncertainty": "Monte Carlo N=300 pada TEMP/RH/PRECIP",
+    "backtest": "multi-year average (2021-2025)",
+    "transposisi": "Perez et al. (1990)",
+    "dekomposisi": "Erbs et al. (1982)",
+    "variabilitas": "CV berdasarkan 5 tahun data"
+  },
+  "lokasi_target": {
+    "nama": "Jakarta",
+    "lat": -6.2,
+    "lon": 106.8,
+    "grid_id": "-6.5000_106.5000"
+  },
+  "model_terpilih": {
+    "algoritma": "lightgbm",
+    "skenario": "METEO",
+    "model_terbaik_per_skenario": {
+      "METEO": "xgboost",
+      "FULL": "lightgbm"
+    }
+  },
+  "parameter_pv": {
+    "capacity_kWp": 5.0,
+    "tilt_deg": 10.0,
+    "azimuth_deg": 0.0,
+    "albedo": 0.2
+  },
+  "parameter_ekonomi": {
+    "capex_total": 75000000.0,
+    "tarif_Rp_kWh": 1444.7,
+    "lifetime_thn": 25,
+    "discount_rate": 0.06,
+    "degradasi": 0.005,
+    "performance_ratio": 0.8,
+    "self_consumption": 0.65,
+    "opex_rate": 0.01,
+    "eskalasi_tarif": 0.03
+  },
+  "sumber_daya_multiyear": {
+    "tahun_analisis": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "GHI_mean_kWh_m2_thn": 1721.2038102810407,
+    "GHI_std": 65.5623648859934,
+    "GHI_cv_pct": 3.8090994508830587,
+    "POA_mean_kWh_m2_thn": 1724.0645324774382,
+    "POA_std": 66.89948544886941,
+    "POA_cv_pct": 3.8803353464232866,
+    "AEP_mean_kWh": 6896.258129909753,
+    "AEP_std": 267.59794179547777,
+    "AEP_cv_pct": 3.880335346423288
+  },
+  "forecast_2026": {
+    "tahun": 2026,
+    "metode_covariate": "climatology day-of-year (mean) dari 2021-2025",
+    "GHI_kWh_m2_thn": 1650.754115750999,
+    "GHI_p10": 1530.2957343983223,
+    "GHI_p50": 1665.2171726090241,
+    "GHI_p90": 2018.0477179961406,
+    "POA_kWh_m2_thn": 1651.0588908467626,
+    "POA_p10": 1527.394546059278,
+    "POA_p90": 2027.3812613922532,
+    "AEP_kWh": 6604.23556338705,
+    "AEP_p10": 6109.578184237112,
+    "AEP_p90": 8109.525045569013,
+    "specific_yield_kWh_kWp": 1320.84711267741,
+    "monte_carlo_N": 300
+  },
+  "energi": {
+    "POA_thn_kWh_m2": 1651.0588908467626,
+    "E_tahun1_kWh": 6604.23556338705,
+    "specific_yield_kWh_kWp": 1320.84711267741
+  },
+  "indikator": {
+    "NPV": 15912640.475590354,
+    "layak": true
+  }
+}

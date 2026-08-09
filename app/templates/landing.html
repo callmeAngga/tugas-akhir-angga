@@ -1,0 +1,681 @@
+{% extends "base.html" %}
+{% block title %}TEA Atap PV — Beranda{% endblock %}
+
+{% block head %}
+<style>
+    .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 80px 28px 64px;
+        gap: 0;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(47,129,247,.12);
+        border: 1px solid rgba(47,129,247,.35);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        padding: 6px 14px;
+        border-radius: 999px;
+        margin-bottom: 28px;
+    }
+
+    .hero-badge .dot {
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: var(--accent-2);
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: .5; transform: scale(.75); }
+    }
+
+    .hero h1 {
+        font-size: clamp(36px, 6vw, 64px);
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+        max-width: 820px;
+        margin-bottom: 22px;
+    }
+
+    .hero h1 .grad {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hero .sub {
+        font-size: clamp(15px, 2vw, 18px);
+        color: var(--text-dim);
+        max-width: 600px;
+        line-height: 1.65;
+        margin-bottom: 40px;
+    }
+
+    .hero-cta {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn-lg {
+        font-size: 16px;
+        padding: 16px 32px;
+        border-radius: 12px;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        padding: 16px 32px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: border-color .15s, background .15s;
+    }
+    .btn-outline:hover {
+        border-color: var(--accent);
+        background: rgba(47,129,247,.06);
+    }
+
+    /* ---------- Divider ---------- */
+    .divider {
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--border), transparent);
+        margin: 0 0 64px;
+    }
+
+    /* ---------- Section wrapper ---------- */
+    .section {
+        max-width: 1100px;
+        margin: 0 auto 72px;
+        padding: 0 28px;
+    }
+
+    .section-tag {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+    }
+
+    .section-title {
+        font-family: 'Sora', sans-serif;
+        font-size: clamp(22px, 3.5vw, 32px);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 10px;
+    }
+
+    .section-desc {
+        color: var(--text-dim);
+        font-size: 15px;
+        line-height: 1.7;
+        /* max-width: 780px; */
+        margin-bottom: 40px;
+    }
+
+    /* ---------- Feature cards ---------- */
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .feature-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px 26px;
+        transition: border-color .2s, transform .2s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(47,129,247,.06) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity .25s;
+    }
+
+    .feature-card:hover {
+        border-color: rgba(47,129,247,.45);
+        transform: translateY(-3px);
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+        width: 44px; height: 44px;
+        border-radius: 12px;
+        display: grid; place-items: center;
+        font-size: 22px;
+        margin-bottom: 18px;
+        background: rgba(47,129,247,.12);
+        border: 1px solid rgba(47,129,247,.2);
+    }
+
+    .feature-card h3 {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .feature-card p {
+        font-size: 13.5px;
+        color: var(--text-dim);
+        line-height: 1.65;
+    }
+
+    /* ---------- Input / Output ---------- */
+    .io-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    @media (max-width: 640px) {
+        .io-wrap { grid-template-columns: 1fr; }
+    }
+
+    .io-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .io-box-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    .io-box-head .pill {
+        font-size: 11px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+    }
+
+    .pill-in  { background: rgba(47,129,247,.15); color: var(--accent); border: 1px solid rgba(47,129,247,.3); }
+    .pill-out { background: rgba(63,185,80,.15);  color: var(--good);   border: 1px solid rgba(63,185,80,.3); }
+
+    .io-list {
+        list-style: none;
+        padding: 14px 0;
+    }
+
+    .io-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 10px 22px;
+        font-size: 13.5px;
+        border-bottom: 1px solid var(--border);
+        transition: background .15s;
+    }
+
+    .io-list li:last-child { border-bottom: none; }
+    .io-list li:hover { background: var(--surface-2); }
+
+    .io-list .ico {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-top: 1px;
+    }
+
+    .io-list .io-label {
+        font-weight: 600;
+        color: var(--text);
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .io-list .io-desc {
+        color: var(--text-dim);
+        font-size: 12px;
+    }
+
+    /* ---------- Stepper ---------- */
+    .stepper {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+    }
+
+    .stepper::before {
+        content: '';
+        position: absolute;
+        left: 21px;
+        top: 44px;
+        bottom: 44px;
+        width: 2px;
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        opacity: .25;
+    }
+
+    .step {
+        display: flex;
+        gap: 22px;
+        align-items: flex-start;
+        padding: 22px 0;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+    }
+
+    .step:last-child { border-bottom: none; }
+
+    .step-num {
+        flex-shrink: 0;
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        display: grid; place-items: center;
+        font-family: 'Sora', sans-serif;
+        font-weight: 800;
+        font-size: 16px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        color: #fff;
+        position: relative;
+        z-index: 1;
+    }
+
+    .step-body h3 {
+        font-size: 16px;
+        margin-bottom: 6px;
+        margin-top: 10px;
+    }
+
+    .step-body p {
+        font-size: 13.5px;
+        color: var(--text-dim);
+        line-height: 1.65;
+    }
+
+    .step-body .tip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        background: rgba(0,212,255,.08);
+        border: 1px solid rgba(0,212,255,.2);
+        color: var(--accent-2);
+        font-size: 12px;
+        padding: 5px 12px;
+        border-radius: 8px;
+    }
+
+    /* ---------- Tech stack ---------- */
+    .tech-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .tech-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: border-color .15s;
+    }
+
+    .tech-pill:hover { border-color: var(--accent); }
+    .tech-pill .dot-tech {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+    }
+
+    /* ---------- CTA bottom ---------- */
+    .cta-bottom {
+        background: linear-gradient(135deg, var(--surface), var(--surface-2));
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 56px 40px;
+        text-align: center;
+        max-width: 1100px;
+        margin: 0 auto 64px;
+    }
+
+    .cta-bottom h2 {
+        font-size: clamp(24px, 4vw, 38px);
+        margin-bottom: 14px;
+    }
+
+    .cta-bottom p {
+        color: var(--text-dim);
+        font-size: 15px;
+        margin-bottom: 32px;
+        max-width: 480px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* ---------- Footer ---------- */
+    .footer {
+        border-top: 1px solid var(--border);
+        padding: 24px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 12px;
+        color: var(--text-dim);
+        max-width: 100%;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 600px) {
+        .hero { padding: 56px 20px 48px; }
+        .section { padding: 0 16px; }
+        .cta-bottom { padding: 36px 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-badge">
+        <span class="dot"></span>
+        Analisis Tekno-Ekonomi · Panel Surya Atap
+    </div>
+
+    <h1>
+        Evaluasi Kelayakan Panel Surya Atap Anda<br>
+        <span class="grad">dalam Hitungan Menit</span>
+    </h1>
+
+    <p class="sub">
+        Gambar atap Anda langsung di peta satelit, dan sistem berbasis ML kami
+        akan langsung mengestimasi produksi energi surya tahunan serta menghitung
+        Net Present Value (NPV).
+    </p>
+
+    <div class="hero-cta">
+        <a href="{{ url_for('analyze') }}">
+            <button class="btn btn-primary btn-lg">Mulai Analisis →</button>
+        </a>
+        <a href="#cara-pakai">
+            <button class="btn-outline">Cara Penggunaan</button>
+        </a>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="section" id="fitur">
+    <div class="section-tag">Fitur Utama</div>
+    <h2 class="section-title">Semua yang Anda butuhkan untuk mengevaluasi sistem PLTS atap</h2>
+    <p class="section-desc">
+        Dari koordinat satelit mentah hingga angka NPV yang siap digunakan berikut
+        seluruh pipeline analisis berjalan di browser Anda, didukung model ML
+        terlatih dan transposisi surya berbasis fisika.
+    </p>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🗺️</div>
+            <h3>Pemetaan Atap Interaktif</h3>
+            <p>Gambar poligon atau persegi panjang langsung di peta satelit
+               (OpenStreetMap + Esri). Luas atap bruto dan area yang dapat
+               digunakan dihitung otomatis secara real-time.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">☀️</div>
+            <h3>Prediksi Iradiasi Surya Berbasis ML</h3>
+            <p>Model gradient boosting terlatih (LightGBM / XGBoost, dipilih
+               otomatis berdasarkan RMSE terendah) memprediksi GHI harian dari
+               fitur meteorologi — tanpa perlu API eksternal.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📐</div>
+            <h3>Optimizer Orientasi Panel Berbasis Fisika</h3>
+            <p>Dekomposisi Erbs + transposisi Perez memindai kandidat sudut
+               kemiringan (0–30°) dan merekomendasikan azimuth &amp; tilt yang
+               memaksimalkan iradiasi Plane-of-Array tahunan untuk lokasi Anda.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Produksi Energi Tahunan (AEP)</h3>
+            <p>Kapasitas × POA × Performance Ratio, dirata-rata selama baseline
+               5 tahun (2021–2025) dan disesuaikan dengan degradasi panel tahunan.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <h3>Net Present Value (NPV)</h3>
+            <p>Model arus kas terdiskonto lengkap: CAPEX, OPEX tahunan, penghematan
+               listrik (self-consumption), eskalasi tarif, dan discount rate —
+               semua dapat dikonfigurasi oleh pengguna.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔧</div>
+            <h3>Modul PV &amp; Parameter Ekonomi Fleksibel</h3>
+            <p>Pilih dari modul monokristal/polikristal atau definisikan modul
+               sendiri. Sesuaikan tarif, CAPEX, umur proyek, degradasi, dan
+               discount rate sesuai asumsi proyek Anda.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="io">
+    <div class="section-tag">Input &amp; Output</div>
+    <h2 class="section-title">Apa yang Anda masukkan — apa yang Anda dapatkan</h2>
+    <p class="section-desc">
+        Alat ini dirancang agar mudah digunakan tanpa keahlian teknis khusus.
+        Anda menggambar, mengonfigurasi, dan langsung mendapatkan hasil.
+    </p>
+
+    <div class="io-wrap">
+        <!-- INPUT -->
+        <div class="io-box">
+            <div class="io-box-head">
+                <span class="pill pill-in">INPUT</span>
+                Yang Anda Masukkan
+            </div>
+            <ul class="io-list">
+                <li>
+                    <span class="ico">📍</span>
+                    <div>
+                        <span class="io-label">Lokasi &amp; Luas Atap</span>
+                        <span class="io-desc">Digambar sebagai poligon/persegi panjang di peta interaktif. Luas bruto dihitung otomatis menggunakan kalkulasi geodesik.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="ico">🔲</span>
+                    <div>
+                        <span class="io-label">Jenis Modul PV</span>
+                        <span class="io-desc">Monokristal 400 Wp / 550 Wp atau Polikristal 330 Wp, atau definisikan modul kustom sendiri. Menentukan jumlah panel &amp; kapasitas terpasang.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="ico">📐</span>
+                    <div>
+                        <span class="io-label">Kemiringan &amp; Azimuth</span>
+                        <span class="io-desc">Direkomendasikan otomatis (scan maksimasi POA) atau dapat diubah secara manual. Default ke orientasi menghadap ekuator.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="ico">⚙️</span>
+                    <div>
+                        <span class="io-label">Performance Ratio</span>
+                        <span class="io-desc">Faktor efisiensi sistem yang memperhitungkan rugi kabel, inverter, dan suhu. Default: 0,80.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="ico">💵</span>
+                    <div>
+                        <span class="io-label">Parameter Ekonomi</span>
+                        <span class="io-desc">Tarif listrik (Rp/kWh), CAPEX (Rp/kWp), discount rate, umur proyek, degradasi tahunan, dan eskalasi tarif.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- OUTPUT -->
+        <div class="io-box">
+            <div class="io-box-head">
+                <span class="pill pill-out">OUTPUT</span>
+                Yang Anda Dapatkan
+            </div>
+            <ul class="io-list">
+                <li>
+                    <span class="ico">🏠</span>
+                    <div>
+                        <span class="io-label">Ukuran Sistem</span>
+                        <span class="io-desc">Luas atap yang dapat digunakan (m²), jumlah panel maksimum, dan total kapasitas terpasang (kWp).</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="ico">🌤️</span>
+                    <div>
+                        <span class="io-label">GHI &amp; POA Tahunan</span>
+                        <span class="io-desc">Iradiasi horizontal global hasil prediksi ML dan iradiasi Plane-of-Array hasil transposisi (kWh/m²/thn), dirata-rata 2021–2025.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="ico">⚡</span>
+                    <div>
+                        <span class="io-label">Produksi Energi Tahunan</span>
+                        <span class="io-desc">Estimasi listrik yang dihasilkan per tahun (kWh/thn), memperhitungkan degradasi selama umur proyek.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="ico">📊</span>
+                    <div>
+                        <span class="io-label">Net Present Value (NPV)</span>
+                        <span class="io-desc">Hasil arus kas terdiskonto dalam Rupiah. NPV positif = layak secara finansial. NPV negatif = tidak layak pada asumsi saat ini.</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="ico">✅</span>
+                    <div>
+                        <span class="io-label">Verdict Kelayakan</span>
+                        <span class="io-desc">"Layak Secara Finansial" atau "Tidak Layak pada Asumsi Ini" — sinyal go/no-go yang jelas untuk pengambil keputusan.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="cara-pakai">
+    <div class="section-tag">Cara Penggunaan</div>
+    <h2 class="section-title">Empat langkah dari peta ke keputusan</h2>
+    <p class="section-desc">
+        Tidak perlu latar belakang teknik surya. Alat ini memandu Anda
+        di setiap langkah secara otomatis.
+    </p>
+
+    <div class="stepper">
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+                <h3>Navigasi ke Bangunan Anda</h3>
+                <p>Peta terbuka terpusat di Jakarta. Perbesar ke bangunan target
+                   menggunakan scroll mouse atau gerakan pinch. Ganti tampilan antara
+                   Street dan Satellite menggunakan kontrol layer (kanan atas peta) —
+                   tampilan Satellite membuat garis atap terlihat jelas.</p>
+                <span class="tip">💡 Tips: Zoom minimal ke level 18–19 untuk akurasi penggambaran area yang optimal.</span>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+                <h3>Gambar Atap Anda</h3>
+                <p>Klik alat <strong>persegi panjang</strong> atau <strong>poligon</strong>
+                   di toolbar kiri atas peta. Telusuri garis luar atap Anda.
+                   Alat ini langsung menghitung luas bruto dan luas yang dapat digunakan
+                   (70% dari bruto, memperhitungkan jarak bebas dan ruang perawatan).
+                   Anda dapat mengedit atau menghapus dan menggambar ulang kapan saja.</p>
+                <span class="tip">💡 Tips: Gunakan alat poligon untuk atap berbentuk tidak beraturan atau berbentuk L.</span>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+                <h3>Tinjau &amp; Sesuaikan Konfigurasi</h3>
+                <p>Panel <strong>Konfigurasi</strong> di bawah peta terisi otomatis dengan
+                   nilai default yang wajar dan rekomendasi kemiringan &amp; azimuth yang
+                   dihitung untuk koordinat Anda. Tinjau setiap parameter:</p>
+                <p style="margin-top:10px;">
+                    • <strong>Modul PV</strong> — pilih kelas watt yang sesuai anggaran Anda, atau masukkan modul kustom.<br>
+                    • <strong>Performance Ratio</strong> — turunkan jika ada bayangan yang diperkirakan (mis. 0,70).<br>
+                    • <strong>Tarif &amp; CAPEX</strong> — perbarui sesuai tarif utilitas lokal dan penawaran instalatur.<br>
+                    • <strong>Kemiringan / Azimuth</strong> — nonaktifkan "Gunakan rekomendasi" untuk memasukkan sudut kustom.
+                </p>
+                <span class="tip">💡 Tips: Biarkan "Gunakan pengaturan rekomendasi" dicentang kecuali Anda memiliki kemiringan atap tertentu.</span>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+                <h3>Jalankan Analisis &amp; Baca Hasil</h3>
+                <p>Klik <strong>Jalankan Analisis →</strong>. Sistem menjalankan
+                   inferensi ML + pipeline fisika secara server-side dan mengembalikan
+                   hasil dalam hitungan detik. Gulir ke bawah untuk melihat:</p>
+                <p style="margin-top:10px;">
+                    • Ukuran sistem (jumlah panel, kapasitas)<br>
+                    • Sumber daya surya (GHI, POA) dirata-rata 2021–2025<br>
+                    • Produksi energi tahunan (kWh/thn)<br>
+                    • Net Present Value dalam Rupiah + verdict Layak / Tidak Layak yang jelas
+                </p>
+                <p style="margin-top:10px;">Sesuaikan parameter apa pun dan jalankan ulang secara instan — tanpa perlu reload halaman.</p>
+                <span class="tip">💡 Tips: Coba nilai CAPEX yang berbeda untuk menemukan biaya instalasi titik impas.</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="cta-bottom">
+    <h2>Siap mengevaluasi atap Anda?</h2>
+    <p>Hanya butuh kurang dari 2 menit. Tidak perlu akun — cukup buka
+       alat dan mulai menggambar.</p>
+    <a href="{{ url_for('analyze') }}">
+        <button class="btn btn-primary btn-lg">Buka Alat Analisis →</button>
+    </a>
+</div>
+
+<footer class="footer">
+    <span>TEA Atap PV · Alat Analisis Tekno-Ekonomi</span>
+    <span>Didukung oleh LightGBM · pvlib · Flask · Leaflet</span>
+</footer>
+
+{% endblock %}

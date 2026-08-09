@@ -1,0 +1,106 @@
+{
+  "algorithm": "lightgbm",
+  "random_state": 42,
+  "scenarios": {
+    "METEO": {
+      "features": [
+        "lat",
+        "lon",
+        "month",
+        "day_of_year",
+        "month_sin",
+        "month_cos",
+        "doy_sin",
+        "doy_cos",
+        "TEMP",
+        "RH",
+        "PRECIP"
+      ],
+      "best_params": {
+        "learning_rate": 0.05,
+        "max_depth": 5,
+        "min_child_samples": 40,
+        "num_leaves": 15
+      },
+      "best_iteration": 79,
+      "cv_rmse": 1.0329214242003837,
+      "metrics_train": {
+        "RMSE": 0.9476351301796306,
+        "MAE": 0.7030243750415828,
+        "R2": 0.42651200505067066
+      },
+      "metrics_test": {
+        "RMSE": 1.0572368657163647,
+        "MAE": 0.793136464650602,
+        "R2": 0.2687495419849555
+      },
+      "model_file": "lightgbm_METEO.txt",
+      "model_pkl": "lightgbm_METEO.pkl",
+      "feature_importance_gain": {
+        "PRECIP": 226524.67,
+        "doy_cos": 47109.35,
+        "month_cos": 33699.53,
+        "RH": 28102.45,
+        "lat": 25207.66,
+        "doy_sin": 15097.67,
+        "TEMP": 7952.16,
+        "day_of_year": 7576.59,
+        "lon": 6683.78,
+        "month_sin": 2354.67,
+        "month": 0.0
+      }
+    },
+    "FULL": {
+      "features": [
+        "lat",
+        "lon",
+        "month",
+        "day_of_year",
+        "month_sin",
+        "month_cos",
+        "doy_sin",
+        "doy_cos",
+        "TEMP",
+        "RH",
+        "PRECIP",
+        "DHI",
+        "DNI"
+      ],
+      "best_params": {
+        "learning_rate": 0.1,
+        "max_depth": 12,
+        "min_child_samples": 20,
+        "num_leaves": 63
+      },
+      "best_iteration": 109,
+      "cv_rmse": 0.19710575209887443,
+      "metrics_train": {
+        "RMSE": 0.1431240191400104,
+        "MAE": 0.1050529273920509,
+        "R2": 0.9869182130085316
+      },
+      "metrics_test": {
+        "RMSE": 0.21516441000869801,
+        "MAE": 0.12751405314215153,
+        "R2": 0.9697125696749607
+      },
+      "model_file": "lightgbm_FULL.txt",
+      "model_pkl": "lightgbm_FULL.pkl",
+      "feature_importance_gain": {
+        "DNI": 335666.26,
+        "DHI": 92817.68,
+        "doy_cos": 21853.24,
+        "month_cos": 18635.36,
+        "doy_sin": 2740.65,
+        "day_of_year": 902.38,
+        "lat": 894.38,
+        "PRECIP": 869.15,
+        "lon": 348.39,
+        "TEMP": 314.91,
+        "RH": 189.89,
+        "month": 86.96,
+        "month_sin": 11.25
+      }
+    }
+  }
+}

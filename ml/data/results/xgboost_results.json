@@ -1,0 +1,106 @@
+{
+  "algorithm": "xgboost",
+  "random_state": 42,
+  "scenarios": {
+    "METEO": {
+      "features": [
+        "lat",
+        "lon",
+        "month",
+        "day_of_year",
+        "month_sin",
+        "month_cos",
+        "doy_sin",
+        "doy_cos",
+        "TEMP",
+        "RH",
+        "PRECIP"
+      ],
+      "best_params": {
+        "gamma": 0.5,
+        "learning_rate": 0.05,
+        "max_depth": 6,
+        "min_child_weight": 1
+      },
+      "best_iteration": 83,
+      "cv_rmse": 1.03705840168851,
+      "metrics_train": {
+        "RMSE": 0.8991344608778428,
+        "MAE": 0.6625215653717609,
+        "R2": 0.4837128538397443
+      },
+      "metrics_test": {
+        "RMSE": 1.0519671304852396,
+        "MAE": 0.7869325644361678,
+        "R2": 0.2760211244708216
+      },
+      "model_file": "xgboost_METEO.json",
+      "model_pkl": "xgboost_METEO.pkl",
+      "feature_importance_gain": {
+        "month_cos": 426.12,
+        "PRECIP": 374.36,
+        "month_sin": 72.97,
+        "doy_cos": 66.51,
+        "lat": 54.14,
+        "RH": 49.0,
+        "doy_sin": 39.43,
+        "lon": 28.62,
+        "TEMP": 25.62,
+        "day_of_year": 21.96,
+        "month": 12.75
+      }
+    },
+    "FULL": {
+      "features": [
+        "lat",
+        "lon",
+        "month",
+        "day_of_year",
+        "month_sin",
+        "month_cos",
+        "doy_sin",
+        "doy_cos",
+        "TEMP",
+        "RH",
+        "PRECIP",
+        "DHI",
+        "DNI"
+      ],
+      "best_params": {
+        "gamma": 0.1,
+        "learning_rate": 0.1,
+        "max_depth": 10,
+        "min_child_weight": 10
+      },
+      "best_iteration": 66,
+      "cv_rmse": 0.19720894276708592,
+      "metrics_train": {
+        "RMSE": 0.12598257570146953,
+        "MAE": 0.09257183662424832,
+        "R2": 0.98986408422776
+      },
+      "metrics_test": {
+        "RMSE": 0.2538652367667929,
+        "MAE": 0.12968920115721716,
+        "R2": 0.9578373379819343
+      },
+      "model_file": "xgboost_FULL.json",
+      "model_pkl": "xgboost_FULL.pkl",
+      "feature_importance_gain": {
+        "DNI": 105.88,
+        "month_cos": 70.45,
+        "DHI": 22.72,
+        "doy_cos": 15.21,
+        "day_of_year": 1.63,
+        "lat": 0.62,
+        "PRECIP": 0.49,
+        "doy_sin": 0.49,
+        "month": 0.48,
+        "lon": 0.31,
+        "TEMP": 0.28,
+        "RH": 0.25,
+        "month_sin": 0.18
+      }
+    }
+  }
+}

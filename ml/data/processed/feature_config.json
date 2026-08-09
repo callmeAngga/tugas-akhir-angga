@@ -1,0 +1,82 @@
+{
+    "target": "GHI",
+    "feature_sets": {
+        "METEO": [
+            "lat",
+            "lon",
+            "month",
+            "day_of_year",
+            "month_sin",
+            "month_cos",
+            "doy_sin",
+            "doy_cos",
+            "TEMP",
+            "RH",
+            "PRECIP"
+        ],
+        "FULL": [
+            "lat",
+            "lon",
+            "month",
+            "day_of_year",
+            "month_sin",
+            "month_cos",
+            "doy_sin",
+            "doy_cos",
+            "TEMP",
+            "RH",
+            "PRECIP",
+            "DHI",
+            "DNI"
+        ]
+    },
+    "base_features": [
+        "lat",
+        "lon",
+        "month",
+        "day_of_year",
+        "month_sin",
+        "month_cos",
+        "doy_sin",
+        "doy_cos",
+        "TEMP",
+        "RH",
+        "PRECIP"
+    ],
+    "irradiance_features": [
+        "DHI",
+        "DNI"
+    ],
+    "spatial_features": [
+        "lat",
+        "lon"
+    ],
+    "temporal_features": [
+        "month",
+        "day_of_year",
+        "month_sin",
+        "month_cos",
+        "doy_sin",
+        "doy_cos"
+    ],
+    "meteo_features": [
+        "TEMP",
+        "RH",
+        "PRECIP"
+    ],
+    "split": {
+        "train_years": [
+            2021,
+            2022,
+            2023,
+            2024
+        ],
+        "test_years": [
+            2025
+        ],
+        "column": "split"
+    },
+    "dataset_file": "features_dataset.parquet",
+    "n_rows": 73040,
+    "n_locations": 40
+}
