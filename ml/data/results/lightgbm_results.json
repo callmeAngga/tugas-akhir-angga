@@ -17,37 +17,36 @@
         "PRECIP"
       ],
       "best_params": {
-        "learning_rate": 0.05,
-        "max_depth": 5,
-        "min_child_samples": 40,
-        "num_leaves": 15
+        "min_child_samples": 300,
+        "min_gain_to_split": 0.1,
+        "num_leaves": 45
       },
-      "best_iteration": 79,
-      "cv_rmse": 1.0329214242003837,
+      "best_iteration": 316,
+      "cv_rmse": 1.079010919105336,
       "metrics_train": {
-        "RMSE": 0.9476351301796306,
-        "MAE": 0.7030243750415828,
-        "R2": 0.42651200505067066
+        "RMSE": 0.9169027324448067,
+        "MAE": 0.67913221156184,
+        "R2": 0.46310598776234513
       },
       "metrics_test": {
-        "RMSE": 1.0572368657163647,
-        "MAE": 0.793136464650602,
-        "R2": 0.2687495419849555
+        "RMSE": 1.0516140692841829,
+        "MAE": 0.7882905507277526,
+        "R2": 0.2765070064916706
       },
       "model_file": "lightgbm_METEO.txt",
       "model_pkl": "lightgbm_METEO.pkl",
       "feature_importance_gain": {
-        "PRECIP": 226524.67,
-        "doy_cos": 47109.35,
-        "month_cos": 33699.53,
-        "RH": 28102.45,
-        "lat": 25207.66,
-        "doy_sin": 15097.67,
-        "TEMP": 7952.16,
-        "day_of_year": 7576.59,
-        "lon": 6683.78,
-        "month_sin": 2354.67,
-        "month": 0.0
+        "PRECIP": 1140520.35,
+        "doy_cos": 334644.36,
+        "RH": 158007.33,
+        "doy_sin": 130887.16,
+        "lat": 121024.85,
+        "day_of_year": 103768.94,
+        "TEMP": 69002.5,
+        "lon": 65786.82,
+        "month": 2906.29,
+        "month_cos": 1823.57,
+        "month_sin": 1215.5
       }
     },
     "FULL": {
@@ -67,39 +66,38 @@
         "DNI"
       ],
       "best_params": {
-        "learning_rate": 0.1,
-        "max_depth": 12,
-        "min_child_samples": 20,
-        "num_leaves": 63
+        "min_child_samples": 100,
+        "min_gain_to_split": 0.05,
+        "num_leaves": 45
       },
-      "best_iteration": 109,
-      "cv_rmse": 0.19710575209887443,
+      "best_iteration": 812,
+      "cv_rmse": 0.5427969861556028,
       "metrics_train": {
-        "RMSE": 0.1431240191400104,
-        "MAE": 0.1050529273920509,
-        "R2": 0.9869182130085316
+        "RMSE": 0.1529509392568903,
+        "MAE": 0.11167470336319955,
+        "R2": 0.9850601470395988
       },
       "metrics_test": {
-        "RMSE": 0.21516441000869801,
-        "MAE": 0.12751405314215153,
-        "R2": 0.9697125696749607
+        "RMSE": 0.21472100976053696,
+        "MAE": 0.12783315672189174,
+        "R2": 0.9698372707511471
       },
       "model_file": "lightgbm_FULL.txt",
       "model_pkl": "lightgbm_FULL.pkl",
       "feature_importance_gain": {
-        "DNI": 335666.26,
-        "DHI": 92817.68,
-        "doy_cos": 21853.24,
-        "month_cos": 18635.36,
-        "doy_sin": 2740.65,
-        "day_of_year": 902.38,
-        "lat": 894.38,
-        "PRECIP": 869.15,
-        "lon": 348.39,
-        "TEMP": 314.91,
-        "RH": 189.89,
-        "month": 86.96,
-        "month_sin": 11.25
+        "DNI": 3194683.55,
+        "DHI": 898642.05,
+        "doy_cos": 364092.39,
+        "doy_sin": 30851.88,
+        "day_of_year": 13990.83,
+        "PRECIP": 7879.79,
+        "lat": 7658.2,
+        "month_sin": 5098.86,
+        "lon": 2593.55,
+        "TEMP": 2269.49,
+        "RH": 1056.49,
+        "month": 902.97,
+        "month_cos": 67.73
       }
     }
   }

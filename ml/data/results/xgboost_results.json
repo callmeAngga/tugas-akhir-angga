@@ -17,37 +17,36 @@
         "PRECIP"
       ],
       "best_params": {
-        "gamma": 0.5,
-        "learning_rate": 0.05,
-        "max_depth": 6,
-        "min_child_weight": 1
+        "gamma": 0.05,
+        "max_depth": 5,
+        "min_child_weight": 200
       },
-      "best_iteration": 83,
-      "cv_rmse": 1.03705840168851,
+      "best_iteration": 368,
+      "cv_rmse": 1.084893352445206,
       "metrics_train": {
-        "RMSE": 0.8991344608778428,
-        "MAE": 0.6625215653717609,
-        "R2": 0.4837128538397443
+        "RMSE": 0.9387801174922948,
+        "MAE": 0.6936726649924779,
+        "R2": 0.4371796490122214
       },
       "metrics_test": {
-        "RMSE": 1.0519671304852396,
-        "MAE": 0.7869325644361678,
-        "R2": 0.2760211244708216
+        "RMSE": 1.0554679719973858,
+        "MAE": 0.7911830286136523,
+        "R2": 0.2711944477279238
       },
       "model_file": "xgboost_METEO.json",
       "model_pkl": "xgboost_METEO.pkl",
       "feature_importance_gain": {
-        "month_cos": 426.12,
-        "PRECIP": 374.36,
-        "month_sin": 72.97,
-        "doy_cos": 66.51,
-        "lat": 54.14,
-        "RH": 49.0,
-        "doy_sin": 39.43,
-        "lon": 28.62,
-        "TEMP": 25.62,
-        "day_of_year": 21.96,
-        "month": 12.75
+        "PRECIP": 685.19,
+        "doy_cos": 174.99,
+        "doy_sin": 122.16,
+        "RH": 110.91,
+        "lat": 105.07,
+        "day_of_year": 79.19,
+        "month_sin": 71.64,
+        "lon": 47.45,
+        "TEMP": 45.57,
+        "month": 44.95,
+        "month_cos": 28.35
       }
     },
     "FULL": {
@@ -67,39 +66,38 @@
         "DNI"
       ],
       "best_params": {
-        "gamma": 0.1,
-        "learning_rate": 0.1,
-        "max_depth": 10,
-        "min_child_weight": 10
+        "gamma": 0.05,
+        "max_depth": 5,
+        "min_child_weight": 100
       },
-      "best_iteration": 66,
-      "cv_rmse": 0.19720894276708592,
+      "best_iteration": 1253,
+      "cv_rmse": 0.5554493764736015,
       "metrics_train": {
-        "RMSE": 0.12598257570146953,
-        "MAE": 0.09257183662424832,
-        "R2": 0.98986408422776
+        "RMSE": 0.15977629297364687,
+        "MAE": 0.11684146358175689,
+        "R2": 0.9836970308030063
       },
       "metrics_test": {
-        "RMSE": 0.2538652367667929,
-        "MAE": 0.12968920115721716,
-        "R2": 0.9578373379819343
+        "RMSE": 0.2582866621864163,
+        "MAE": 0.13421525589686223,
+        "R2": 0.9563559028311845
       },
       "model_file": "xgboost_FULL.json",
       "model_pkl": "xgboost_FULL.pkl",
       "feature_importance_gain": {
-        "DNI": 105.88,
-        "month_cos": 70.45,
-        "DHI": 22.72,
-        "doy_cos": 15.21,
-        "day_of_year": 1.63,
-        "lat": 0.62,
-        "PRECIP": 0.49,
-        "doy_sin": 0.49,
-        "month": 0.48,
-        "lon": 0.31,
-        "TEMP": 0.28,
-        "RH": 0.25,
-        "month_sin": 0.18
+        "DNI": 411.7,
+        "DHI": 119.18,
+        "doy_cos": 106.54,
+        "month_sin": 29.81,
+        "day_of_year": 17.87,
+        "PRECIP": 5.22,
+        "lat": 3.44,
+        "month": 2.67,
+        "doy_sin": 2.48,
+        "lon": 1.55,
+        "TEMP": 1.18,
+        "month_cos": 1.1,
+        "RH": 0.77
       }
     }
   }
